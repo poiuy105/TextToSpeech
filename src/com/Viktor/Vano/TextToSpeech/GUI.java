@@ -1,4 +1,6 @@
 package com.Viktor.Vano.TextToSpeech;
+import com.Viktor.Vano.TextToSpeech.Files.BooleanFile;
+import com.Viktor.Vano.TextToSpeech.Files.IntegerFile;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,13 +17,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
-import static com.Viktor.Vano.TextToSpeech.FileManager.*;
 
 public class GUI extends Application {
-    private final String version = "20240606";
+    private final String version = "20260110";
     private int port = 7775;
+    private boolean progressBarPresent = false;
     private final int width = 450;
     private final int height = 150;
     private TextToSpeechServer textToSpeechServer;
@@ -50,8 +51,17 @@ public class GUI extends Application {
         stage.setMaxHeight(stage.getHeight());
         stage.setResizable(false);
 
+        createDirectoryIfNotExist("res");
+
         try{
-            port = Integer.parseInt(Objects.requireNonNull(readOrCreateFile("tts_port.txt")));
+            port = IntegerFile.loadIntegerFromFile("tts_port.txt", port);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try{
+            progressBarPresent = BooleanFile.loadBooleanFromFile("tts_progress_bar_present.txt", progressBarPresent);
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -68,13 +78,23 @@ public class GUI extends Application {
         progressBar.setLayoutY(120);
         progressBar.setPrefWidth(400);
         progressBar.setStyle("-fx-accent: red");
-        pane.getChildren().add(progressBar);
+        if(progressBarPresent)
+        {
+            pane.getChildren().add(progressBar);
+        }
 
         pane.setOnMouseClicked(event -> {
             if(pane.getChildren().contains(progressBar))
+            {
                 pane.getChildren().remove(progressBar);
+                progressBarPresent = false;
+            }
             else
+            {
                 pane.getChildren().add(progressBar);
+                progressBarPresent = true;
+            }
+            BooleanFile.saveBooleanToFile("tts_progress_bar_present.txt", progressBarPresent);
         });
 
         try
@@ -107,7 +127,7 @@ public class GUI extends Application {
             int selectedIndex = comboBox.getSelectionModel().getSelectedIndex();
             if(selectedIndex != -1)
             {
-                writeToFile("tts_audio.txt", String.valueOf(selectedIndex));
+                IntegerFile.saveIntegerToFile("tts_audio.txt", selectedIndex);
                 System.out.println("\n\nUsing audio output device [" + selectedIndex + "]:");
                 Mixer.Info selectedInfo = audios.get(selectedIndex);
                 System.out.println(String.format("Name: [%s]\nDescription: [%s]", selectedInfo.getName(), selectedInfo.getDescription()));
@@ -123,7 +143,6 @@ public class GUI extends Application {
             clearAudioDevicesFromComboBox();
             addAudioDevicesToComboBox();
             audioIndex = 0;
-            writeToFile("tts_audio.txt", "0");
             comboBox.getSelectionModel().select(0);
         });
         pane.getChildren().add(buttonRefresh);
@@ -147,7 +166,7 @@ public class GUI extends Application {
         }
 
         try{
-            audioIndex = Integer.parseInt(Objects.requireNonNull(readOrCreateFile("tts_audio.txt")));
+            audioIndex = IntegerFile.loadIntegerFromFile("tts_audio.txt", audioIndex);
         }catch (Exception e)
         {
             e.printStackTrace();
@@ -156,7 +175,6 @@ public class GUI extends Application {
         if(audios.size()-1 < audioIndex)
         {
             audioIndex = 0;
-            writeToFile("tts_audio.txt", "0");
         }
 
         System.out.println("\n\nUsing audio output device [" + audioIndex + "]:");
@@ -202,5 +220,14 @@ public class GUI extends Application {
     {
         super.stop();
         textToSpeechServer.stopServer();
+    }
+
+    public static void createDirectoryIfNotExist(String directoryName)
+    {
+        File file = new File(directoryName);
+        if(file.mkdir())
+            System.out.println("New directory \"" + directoryName + "\" was created.");
+        else
+            System.out.println("Directory \"" + directoryName + "\" already exists.");
     }
 }
