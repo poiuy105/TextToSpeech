@@ -19,10 +19,19 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y unzip wget
+
+    - name: Download Gradle
+      run: |
+        wget -O gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip
+        unzip gradle.zip
+        mv gradle-8.2 gradle
+
     - name: Build Android app
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: clean assembleRelease
+      run: ./gradle/bin/gradle clean assembleRelease --no-daemon --stacktrace --info
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
