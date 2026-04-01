@@ -19,37 +19,10 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y unzip wget
-
-    - name: List directory contents
-      run: ls -la
-
-    - name: List app directory contents
-      run: ls -la app/
-
-    - name: List app/src directory contents
-      run: ls -la app/src/
-
-    - name: List app/src/main directory contents
-      run: ls -la app/src/main/
-
-    - name: List app/src/main/res directory contents
-      run: ls -la app/src/main/res/
-
-    - name: Download Gradle
-      run: |
-        wget -O gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip
-        unzip gradle.zip
-        mv gradle-8.2 gradle
-
-    - name: Build with Gradle
-      run: ./gradle/bin/gradle clean assembleRelease --no-daemon --stacktrace --info
+    - name: Build Android app
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: clean assembleRelease
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
