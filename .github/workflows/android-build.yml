@@ -22,10 +22,14 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Download Gradle
+      run: |
+        wget -O gradle.zip https://services.gradle.org/distributions/gradle-7.6.3-bin.zip
+        unzip gradle.zip
+        mv gradle-7.6.3 gradle
+
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: assembleRelease --no-daemon --stacktrace
+      run: ./gradle/bin/gradle assembleRelease --no-daemon --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
