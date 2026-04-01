@@ -34,10 +34,14 @@ jobs:
     - name: List app/src/main directory contents
       run: ls -la app/src/main/
 
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: assembleRelease --no-daemon --stacktrace --info
+    - name: List app/src/main/res directory contents
+      run: ls -la app/src/main/res/
+
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+
+    - name: Build with Gradle wrapper
+      run: ./gradlew assembleRelease --no-daemon --stacktrace --info
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
