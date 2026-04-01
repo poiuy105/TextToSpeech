@@ -28,8 +28,11 @@ jobs:
         unzip gradle.zip
         mv gradle-7.6.3 gradle
 
+    - name: List directory contents
+      run: ls -la
+
     - name: Build with Gradle
-      run: ./gradle/bin/gradle assembleRelease --no-daemon --stacktrace
+      run: ./gradle/bin/gradle assembleRelease --no-daemon --stacktrace --info
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
