@@ -22,10 +22,17 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: List directory contents
+      run: ls -la
+
+    - name: List app directory contents
+      run: ls -la app/
+
     - name: Build Android app
       uses: gradle/gradle-build-action@v2
       with:
         arguments: clean assembleRelease --stacktrace --info
+        gradle-version: 8.2
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
