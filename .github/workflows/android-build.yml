@@ -23,7 +23,9 @@ jobs:
       uses: android-actions/setup-android@v3
 
     - name: Build with Gradle
-      run: gradle assembleRelease --no-daemon --stacktrace
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: assembleRelease --no-daemon --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
