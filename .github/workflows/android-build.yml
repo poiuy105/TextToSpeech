@@ -31,6 +31,15 @@ jobs:
     - name: List app directory contents
       run: ls -la app/
 
+    - name: List app/src directory contents
+      run: ls -la app/src/
+
+    - name: List app/src/main directory contents
+      run: ls -la app/src/main/
+
+    - name: List app/src/main/res directory contents
+      run: ls -la app/src/main/res/
+
     - name: Build Android app
       uses: gradle/gradle-build-action@v2
       with:
