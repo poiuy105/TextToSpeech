@@ -40,11 +40,11 @@ jobs:
     - name: List app/src/main/res directory contents
       run: ls -la app/src/main/res/
 
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+
     - name: Build Android app
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: clean assembleRelease --stacktrace --info
-        gradle-version: 8.2
+      run: ./gradlew clean assembleRelease --no-daemon --stacktrace --info
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
