@@ -1,83 +1,42 @@
-# TextToSpeech
- Text to speech app that listens on a server socket.
-  
-  
-### Server Socket  
-It listens on a port 7775 by default. The port can be changed in "port.txt".  
-  
-### Essential JAR library  
-[Download FreeTTS-1.2.2.jar in a ZIP](https://download.jar-download.com/cache_jars/net.sf.sociaal/freetts/1.2.2/jar_files.zip)  
-[Search FreeTTS on jar-download.com](https://jar-download.com/artifact-search/freetts)  
-  
-### Screenshots  
-![alt text](https://github.com/viktorvano/TextToSpeech/blob/main/screenshots/TTS.png?raw=true)  
-  
-  
-### Client Code Example  
-```Java
-import java.net.*;
-import java.io.*;
+# TCP To Speech Android App
 
-public class Client {
-    // initialize socket and input output streams
-    private Socket socket            = null;
-    private DataInputStream  input   = null;
-    private DataOutputStream out     = null;
+This is an Android application that listens for TCP connections on port 7775 and converts received text to speech.
 
-    // constructor to put ip address and port
-    public Client(String address, int port)
-    {
-        // establish a connection
-        try
-        {
-            socket = new Socket(address, port);
-            System.out.println("Connected");
+## Features
+- Listens on TCP port 7775 for incoming connections
+- Converts received text to speech using Android's TextToSpeech API
+- Displays server status and last received message
+- Runs as a foreground service for continuous operation
 
-            // takes input from terminal
-            input  = new DataInputStream(System.in);
+## Prerequisites
+- Android Studio
+- Android device or emulator running Android 5.0 (API level 21) or higher
 
-            // sends output to the socket
-            out    = new DataOutputStream(socket.getOutputStream());
-        }
-        catch(UnknownHostException u)
-        {
-            System.out.println(u);
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
-        }
+## Building the App
+1. Open the project in Android Studio
+2. Sync the project with Gradle files
+3. Build the project
+4. Run the app on your device or emulator
 
-        // string to read message from input
-        String line = "";
+## Testing the App
+1. Start the app on your Android device
+2. Tap "Start Server" to start the TCP server
+3. Use the provided TestClient.java to send test messages:
+   ```bash
+   javac TestClient.java
+   java TestClient <device_ip> "Hello, this is a test message"
+   ```
+4. The app should speak the received message and display it on the screen
 
-        try
-        {
-            line = input.readLine();
-            out.writeUTF(line);
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
-        }
+## Permissions
+The app requires the following permissions:
+- INTERNET: To establish TCP connections
+- FOREGROUND_SERVICE: To run the server as a foreground service
 
+## Port Configuration
+The server listens on port 7775 by default. To change the port, modify the `PORT` constant in `TcpServerService.java`.
 
-        // close the connection
-        try
-        {
-            input.close();
-            out.close();
-            socket.close();
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
-        }
-    }
-
-    public static void main(String[] args)
-    {
-            new Client("192.168.1.15", 7775);
-    }
-}
-```
+## Troubleshooting
+- Ensure your device and test machine are on the same network
+- Check that the port 7775 is not blocked by firewall
+- Verify that text-to-speech is enabled on your device

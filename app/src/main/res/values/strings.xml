@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">TCP To Speech</string>
+    <string name="start_server">Start Server</string>
+    <string name="stop_server">Stop Server</string>
+    <string name="server_status">Server Status: %s</string>
+    <string name="server_running">Running</string>
+    <string name="server_stopped">Stopped</string>
+    <string name="port_number">Port: 7775</string>
+    <string name="last_message">Last Message: %s</string>
+</resources>
