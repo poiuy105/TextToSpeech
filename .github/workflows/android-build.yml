@@ -44,13 +44,13 @@ jobs:
       run: |
         wget -O gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip
         unzip gradle.zip
-        mv gradle-8.2 gradle
+        mv gradle-8.2 gradle-bin
 
     - name: List Gradle directory after download
-      run: ls -la gradle/
+      run: ls -la gradle-bin/
 
     - name: Build Android app using downloaded Gradle
-      run: ./gradle/bin/gradle clean assembleRelease --no-daemon --stacktrace
+      run: ./gradle-bin/bin/gradle clean assembleRelease --no-daemon --stacktrace
 
     - name: Check if APK was generated
       run: ls -la app/build/outputs/apk/release/ || echo "APK directory not found"
