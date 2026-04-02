@@ -19,11 +19,6 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        gradle-version: 8.2
-
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
@@ -33,21 +28,32 @@ jobs:
     - name: List directory contents
       run: ls -la
 
+    - name: List app directory contents
+      run: ls -la app/
+
+    - name: List gradle directory contents
+      run: ls -la gradle/
+
     - name: List gradle/wrapper directory contents
-      run: ls -la gradle/wrapper/
+      run: ls -la gradle/wrapper/ || echo "Directory not found"
 
-    - name: Generate Gradle Wrapper
+    - name: Create gradle/wrapper directory if not exists
+      run: mkdir -p gradle/wrapper
+
+    - name: Download Gradle 8.2
       run: |
-        gradle wrapper --gradle-version 8.2
+        wget -O gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip
+        unzip gradle.zip
+        mv gradle-8.2 gradle
 
-    - name: List gradle/wrapper directory after generation
-      run: ls -la gradle/wrapper/
+    - name: List Gradle directory after download
+      run: ls -la gradle/
 
-    - name: Make gradlew executable
-      run: chmod +x gradlew
+    - name: Build Android app using downloaded Gradle
+      run: ./gradle/bin/gradle clean assembleRelease --no-daemon --stacktrace
 
-    - name: Build Android app
-      run: ./gradlew clean assembleRelease --no-daemon --stacktrace
+    - name: Check if APK was generated
+      run: ls -la app/build/outputs/apk/release/ || echo "APK directory not found"
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
