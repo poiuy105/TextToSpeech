@@ -19,6 +19,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: 8.2
+
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
@@ -28,34 +33,21 @@ jobs:
     - name: List directory contents
       run: ls -la
 
-    - name: List app directory contents
-      run: ls -la app/
+    - name: List gradle/wrapper directory contents
+      run: ls -la gradle/wrapper/
 
-    - name: List app/src directory contents
-      run: ls -la app/src/
-
-    - name: List app/src/main directory contents
-      run: ls -la app/src/main/
-
-    - name: List app/src/main/res directory contents
-      run: ls -la app/src/main/res/
-
-    - name: Install system dependencies
+    - name: Generate Gradle Wrapper
       run: |
-        sudo apt-get update
-        sudo apt-get install -y unzip wget
+        gradle wrapper --gradle-version 8.2
 
-    - name: Download Gradle
-      run: |
-        wget -O gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip
-        unzip gradle.zip
-        mv gradle-8.2 gradle
+    - name: List gradle/wrapper directory after generation
+      run: ls -la gradle/wrapper/
 
-    - name: List Gradle directory contents
-      run: ls -la gradle/
+    - name: Make gradlew executable
+      run: chmod +x gradlew
 
     - name: Build Android app
-      run: ./gradle/bin/gradle clean assembleRelease --no-daemon --stacktrace --info
+      run: ./gradlew clean assembleRelease --no-daemon --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
