@@ -26,6 +26,13 @@ jobs:
         build-tools: 34.0.0
         components: platform-tools,platforms;android-34,build-tools;34.0.0
 
+    - name: Clean Gradle cache
+      run: |
+        rm -rf ~/.gradle/caches
+        rm -rf ~/.gradle/wrapper
+        rm -rf ./gradle/caches
+        rm -rf ./gradle/wrapper
+
     - name: List directory contents
       run: ls -la
 
@@ -38,14 +45,17 @@ jobs:
     - name: List app/src/main directory contents
       run: ls -la app/src/main/
 
+    - name: List app/src/main/java directory contents
+      run: ls -la app/src/main/java/
+
+    - name: List app/src/main/res directory contents
+      run: ls -la app/src/main/res/
+
     - name: List gradle directory contents
       run: ls -la gradle/
 
-    - name: List gradle/wrapper directory contents
-      run: ls -la gradle/wrapper/ || echo "Directory not found"
-
-    - name: Create gradle/wrapper directory if not exists
-      run: mkdir -p gradle/wrapper
+    - name: Create gradle directory if not exists
+      run: mkdir -p gradle
 
     - name: Download Gradle 8.2
       run: |
@@ -62,6 +72,9 @@ jobs:
     - name: Gradle version check
       run: gradle-bin/bin/gradle --version
 
+    - name: Check Gradle dependencies
+      run: gradle-bin/bin/gradle dependencies --no-daemon
+
     - name: Clean build
       run: gradle-bin/bin/gradle clean --no-daemon
 
@@ -70,6 +83,8 @@ jobs:
 
     - name: Check if APK was generated
       run: |
+        ls -la app/build/
+        ls -la app/build/outputs/
         ls -la app/build/outputs/apk/
         ls -la app/build/outputs/apk/release/ || echo "APK directory not found"
 
@@ -78,4 +93,4 @@ jobs:
       with:
         name: app-release
         path: app/build/outputs/apk/release/app-release-unsigned.apk
-        if-no-files-found: warn
+        if-no-files-found: error
