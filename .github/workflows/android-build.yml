@@ -24,12 +24,19 @@ jobs:
       with:
         api-level: 34
         build-tools: 34.0.0
+        components: platform-tools,platforms;android-34,build-tools;34.0.0
 
     - name: List directory contents
       run: ls -la
 
     - name: List app directory contents
       run: ls -la app/
+
+    - name: List app/src directory contents
+      run: ls -la app/src/
+
+    - name: List app/src/main directory contents
+      run: ls -la app/src/main/
 
     - name: List gradle directory contents
       run: ls -la gradle/
@@ -49,14 +56,26 @@ jobs:
     - name: List Gradle directory after download
       run: ls -la gradle-bin/
 
-    - name: Build Android app using downloaded Gradle
-      run: ./gradle-bin/bin/gradle clean assembleRelease --no-daemon --stacktrace
+    - name: Make Gradle executable
+      run: chmod +x gradle-bin/bin/gradle
+
+    - name: Gradle version check
+      run: gradle-bin/bin/gradle --version
+
+    - name: Clean build
+      run: gradle-bin/bin/gradle clean --no-daemon
+
+    - name: Build Android app
+      run: gradle-bin/bin/gradle assembleRelease --no-daemon --stacktrace --info
 
     - name: Check if APK was generated
-      run: ls -la app/build/outputs/apk/release/ || echo "APK directory not found"
+      run: |
+        ls -la app/build/outputs/apk/
+        ls -la app/build/outputs/apk/release/ || echo "APK directory not found"
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
       with:
         name: app-release
         path: app/build/outputs/apk/release/app-release-unsigned.apk
+        if-no-files-found: warn
