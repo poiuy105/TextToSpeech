@@ -26,12 +26,14 @@ jobs:
         build-tools: 34.0.0
         components: platform-tools,platforms;android-34,build-tools;34.0.0
 
-    - name: Clean Gradle cache
+    - name: Clean Gradle cache and remove problematic files
       run: |
         rm -rf ~/.gradle/caches
         rm -rf ~/.gradle/wrapper
         rm -rf ./gradle/caches
         rm -rf ./gradle/wrapper
+        rm -f ./gradlew
+        rm -f ./gradlew.bat
 
     - name: List directory contents
       run: ls -la
@@ -50,9 +52,6 @@ jobs:
 
     - name: List app/src/main/res directory contents
       run: ls -la app/src/main/res/
-
-    - name: List gradle directory contents
-      run: ls -la gradle/
 
     - name: Create gradle directory if not exists
       run: mkdir -p gradle
