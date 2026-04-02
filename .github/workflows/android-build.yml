@@ -26,6 +26,13 @@ jobs:
         build-tools: 34.0.0
         components: platform-tools,platforms;android-34,build-tools;34.0.0
 
+    - name: Check Android SDK installation
+      run: |
+        echo "ANDROID_HOME: $ANDROID_HOME"
+        ls -la $ANDROID_HOME
+        ls -la $ANDROID_HOME/platforms/
+        ls -la $ANDROID_HOME/build-tools/
+
     - name: Clean Gradle cache and remove problematic files
       run: |
         rm -rf ~/.gradle/caches
@@ -55,9 +62,12 @@ jobs:
     - name: List gradle directory contents
       run: ls -la gradle/
 
-    - name: Download Gradle 8.2
+    - name: Download Gradle 8.2 with timeout
       run: |
-        wget -O gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip
+        timeout 120s wget -O gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip || echo "Wget timed out, retrying..."
+        if [ ! -f gradle.zip ]; then
+          wget -O gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip
+        fi
         unzip gradle.zip
         mv gradle-8.2 gradle-bin
 
@@ -70,14 +80,17 @@ jobs:
     - name: Gradle version check
       run: ./gradle-bin/bin/gradle --version
 
-    - name: Check Gradle dependencies
-      run: ./gradle-bin/bin/gradle dependencies --no-daemon
+    - name: Check Gradle dependencies with retry
+      run: |
+        ./gradle-bin/bin/gradle dependencies --no-daemon || ./gradle-bin/bin/gradle dependencies --no-daemon
 
     - name: Clean build
       run: ./gradle-bin/bin/gradle clean --no-daemon
 
-    - name: Build Android app
-      run: ./gradle-bin/bin/gradle assembleRelease --no-daemon --stacktrace --info
+    - name: Build Android app with increased memory
+      run: |
+        export GRADLE_OPTS="-Xmx4g -XX:MaxMetaspaceSize=1g"
+        ./gradle-bin/bin/gradle assembleRelease --no-daemon --stacktrace --info
 
     - name: Check if APK was generated
       run: |
